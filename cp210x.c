@@ -33,7 +33,7 @@ static void cp210x_close(struct usb_serial_port *);
 static int cp210x_ioctl(struct tty_struct *tty, unsigned int cmd, unsigned long arg);
 static void cp210x_get_termios(struct tty_struct *, struct usb_serial_port *);
 static void cp210x_get_termios_port(struct usb_serial_port *port, tcflag_t *cflagp, unsigned int *baudp);
-static void cp210x_change_speed(struct tty_struct *, struct usb_serial_port *, struct ktermios *);
+static void cp210x_change_speed(struct tty_struct *, struct usb_serial_port *, const struct ktermios *);
 static void cp210x_set_termios(struct tty_struct *, struct usb_serial_port *, const struct ktermios *);
 static bool cp210x_tx_empty(struct usb_serial_port *port);
 static int cp210x_tiocmget(struct tty_struct *);
@@ -1328,7 +1328,7 @@ static speed_t cp210x_get_actual_rate(speed_t baud) {
  * For CP2110 freq is 24Mhz and prescale is 4 for request <= 300bps or 1
  * otherwise.
  */
-static void cp210x_change_speed(struct tty_struct *tty, struct usb_serial_port *port, struct ktermios *old_termios) {
+static void cp210x_change_speed(struct tty_struct *tty, struct usb_serial_port *port, const struct ktermios *old_termios) {
   struct usb_serial *serial = port->serial;
   struct cp210x_serial_private *priv = usb_get_serial_data(serial);
   u32 baud;
@@ -1366,7 +1366,7 @@ static void cp210x_set_termios(struct tty_struct *tty, struct usb_serial_port *p
   struct device *dev = &port->dev;
   unsigned int cflag, old_cflag;
   unsigned int iflag, old_iflag;
-  unsigned char *cc;
+
   struct cp210x_serial_private *priv = usb_get_serial_data(port->serial);
   u16 bits;
 
@@ -1374,7 +1374,7 @@ static void cp210x_set_termios(struct tty_struct *tty, struct usb_serial_port *p
   old_cflag = old_termios->c_cflag;
   iflag = tty->termios.c_iflag;
   old_iflag = old_termios->c_iflag;
-  cc = old_termios->c_cc;
+  const unsigned char *cc = old_termios->c_cc;
 
   if (tty->termios.c_ospeed != old_termios->c_ospeed)
     cp210x_change_speed(tty, port, old_termios);
