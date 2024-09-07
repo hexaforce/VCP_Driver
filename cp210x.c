@@ -34,7 +34,7 @@ static int cp210x_ioctl(struct tty_struct *tty, unsigned int cmd, unsigned long 
 static void cp210x_get_termios(struct tty_struct *, struct usb_serial_port *);
 static void cp210x_get_termios_port(struct usb_serial_port *port, tcflag_t *cflagp, unsigned int *baudp);
 static void cp210x_change_speed(struct tty_struct *, struct usb_serial_port *, struct ktermios *);
-static void cp210x_set_termios(struct tty_struct *, struct usb_serial_port *, struct ktermios *);
+static void cp210x_set_termios(struct tty_struct *, struct usb_serial_port *, const struct ktermios *);
 static bool cp210x_tx_empty(struct usb_serial_port *port);
 static int cp210x_tiocmget(struct tty_struct *);
 static int cp210x_tiocmset(struct tty_struct *, unsigned int, unsigned int);
@@ -1358,7 +1358,7 @@ static void cp210x_change_speed(struct tty_struct *tty, struct usb_serial_port *
   tty_encode_baud_rate(tty, baud, baud);
 }
 
-static void cp210x_set_termios(struct tty_struct *tty, struct usb_serial_port *port, struct ktermios *old_termios) {
+static void cp210x_set_termios(struct tty_struct *tty, struct usb_serial_port *port, const struct ktermios *old_termios) {
   u32 ctl_hs;
   u32 flow_repl;
   u16 wValue_set_char;
