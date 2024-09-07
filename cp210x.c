@@ -259,33 +259,34 @@ struct cp210x_port_private {
   bool is_cp2102n_a01;
 };
 
-static struct usb_serial_driver cp210x_device = {.driver =
-                                                     {
-                                                         .owner = THIS_MODULE,
-                                                         .name = "cp210x",
-                                                     },
-                                                 .id_table = id_table,
-                                                 .num_ports = 1,
-                                                 .bulk_in_size = 256,
-                                                 .bulk_out_size = 256,
-                                                 .open = cp210x_open,
-                                                 .close = cp210x_close,
-                                                 .ioctl = cp210x_ioctl,
-                                                 .break_ctl = cp210x_break_ctl,
-                                                 .set_termios = cp210x_set_termios,
-                                                 .tx_empty = cp210x_tx_empty,
-                                                 .throttle = usb_serial_generic_throttle,
-                                                 .unthrottle = usb_serial_generic_unthrottle,
-                                                 .tiocmget = cp210x_tiocmget,
-                                                 .tiocmset = cp210x_tiocmset,
-                                                 .attach = cp210x_attach,
-                                                 .disconnect = cp210x_disconnect,
-                                                 .release = cp210x_release,
-                                                 .port_probe = cp210x_port_probe,
-                                                 .port_remove = cp210x_port_remove,
-                                                 .dtr_rts = cp210x_dtr_rts,
-                                                 .suspend = cp210x_suspend,
-                                                 .resume = cp210x_resume};
+static struct usb_serial_driver cp210x_device = {
+    .driver = {
+      .owner = THIS_MODULE,
+      .name = "cp210x",
+    },
+   .id_table = id_table,
+   .num_ports = 1,
+   .bulk_in_size = 256,
+   .bulk_out_size = 256,
+   .open = cp210x_open,
+   .close = cp210x_close,
+   .ioctl = cp210x_ioctl,
+   .break_ctl = cp210x_break_ctl,
+   .set_termios = cp210x_set_termios,
+   .tx_empty = cp210x_tx_empty,
+   .throttle = usb_serial_generic_throttle,
+   .unthrottle = usb_serial_generic_unthrottle,
+   .tiocmget = cp210x_tiocmget,
+   .tiocmset = cp210x_tiocmset,
+   .attach = cp210x_attach,
+   .disconnect = cp210x_disconnect,
+   .release = cp210x_release,
+   .port_probe = cp210x_port_probe,
+   .port_remove = cp210x_port_remove,
+   .dtr_rts = cp210x_dtr_rts,
+   .suspend = cp210x_suspend,
+   .resume = cp210x_resume
+};
 
 /* IOCTLs */
 #define IOCTL_GPIOGET 0x8000
@@ -931,7 +932,7 @@ static int cp210x_write_device_gpio_u16(struct usb_serial_port *port, u16 val) {
   int result;
 
   result = usb_control_msg(port->serial->dev, usb_sndctrlpipe(port->serial->dev, 0), CP210X_VENDOR_SPECIFIC, REQTYPE_HOST_TO_DEVICE, CP210X_WRITE_LATCH, /* wValue */
-                           val,                                                                                                                          /* wIndex */
+                           val,                              /* wIndex */
                            NULL, 0, USB_CTRL_SET_TIMEOUT);
   if (result != 0) {
     dev_err(&port->dev, "failed set WRITE_LATCH status: %d\n", result);
@@ -958,7 +959,7 @@ static int cp210x_write_gpio_reg_block(struct usb_serial_port *port, u8 bmReques
   memcpy(dmabuf, buf, bufsize);
 
   result = usb_control_msg(serial->dev, usb_sndctrlpipe(serial->dev, 0), CP210X_VENDOR_SPECIFIC, bmRequestType, CP210X_WRITE_LATCH, /* wValue */
-                           port_priv->bInterfaceNumber,                                                                             /* wIndex */
+                           port_priv->bInterfaceNumber,                               /* wIndex */
                            dmabuf, bufsize, USB_CTRL_SET_TIMEOUT);
 
   kfree(dmabuf);
@@ -1242,8 +1243,37 @@ struct cp210x_rate {
   speed_t high;
 };
 
-static const struct cp210x_rate cp210x_an205_table1[] = {{300, 300},     {600, 600},     {1200, 1200},   {1800, 1800},   {2400, 2400},     {4000, 4000},     {4800, 4803},     {7200, 7207},     {9600, 9612},     {14400, 14428},   {16000, 16062},   {19200, 19250},   {28800, 28912},   {38400, 38601},    {51200, 51558},
-                                                         {56000, 56280}, {57600, 58053}, {64000, 64111}, {76800, 77608}, {115200, 117028}, {128000, 129347}, {153600, 156868}, {230400, 237832}, {250000, 254234}, {256000, 273066}, {460800, 491520}, {500000, 567138}, {576000, 670254}, {921600, UINT_MAX}};
+static const struct cp210x_rate cp210x_an205_table1[] = {
+	{ 300, 300 },
+	{ 600, 600 },
+	{ 1200, 1200 },
+	{ 1800, 1800 },
+	{ 2400, 2400 },
+	{ 4000, 4000 },
+	{ 4800, 4803 },
+	{ 7200, 7207 },
+	{ 9600, 9612 },
+	{ 14400, 14428 },
+	{ 16000, 16062 },
+	{ 19200, 19250 },
+	{ 28800, 28912 },
+	{ 38400, 38601 },
+	{ 51200, 51558 },
+	{ 56000, 56280 },
+	{ 57600, 58053 },
+	{ 64000, 64111 },
+	{ 76800, 77608 },
+	{ 115200, 117028 },
+	{ 128000, 129347 },
+	{ 153600, 156868 },
+	{ 230400, 237832 },
+	{ 250000, 254234 },
+	{ 256000, 273066 },
+	{ 460800, 491520 },
+	{ 500000, 567138 },
+	{ 576000, 670254 },
+	{ 921600, UINT_MAX }
+};
 
 /*
  * Quantises the baud rate as per AN205 Table 1
